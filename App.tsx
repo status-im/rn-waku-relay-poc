@@ -27,6 +27,8 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
+import { Waku } from 'js-waku';
+
 const Section: React.FC<{
   title: string;
 }> = ({children, title}) => {
@@ -56,6 +58,27 @@ const Section: React.FC<{
 };
 
 const App = () => {
+  const [waku, setWaku] = React.useState(undefined);
+  const [wakuStatus, setWakuStatus] = React.useState('None');
+
+  // Start Waku
+  React.useEffect(() => {
+    // If Waku is already assigned, the job is done
+    if (!!waku) return;
+    // If Waku status not None, it means we are already starting Waku
+    if (wakuStatus !== 'None') return;
+
+    setWakuStatus('Starting');
+
+    // Create Waku
+    Waku.create({ bootstrap: { default: true } }).then(waku => {
+      // Once done, put it in the state
+      setWaku(waku);
+      // And update the status
+      setWakuStatus('Started');
+    });
+  }, [waku, wakuStatus]);
+
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
@@ -73,19 +96,7 @@ const App = () => {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
+          <Section title="Waku">{wakuStatus}</Section>
           <LearnMoreLinks />
         </View>
       </ScrollView>
