@@ -5,7 +5,7 @@
  * @format
  */
 
- module.exports = {
+module.exports = {
   resolver: {
     extraNodeModules: {
       assert: require.resolve('assert'),
